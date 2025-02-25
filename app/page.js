@@ -1,11 +1,11 @@
 'use client'
 import { Box, Stack, TextField, Button } from "@mui/material";
 import { useState, useRef, useEffect } from "react";
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { createTheme } from '@mui/material/styles';
 import { blue, indigo } from '@mui/material/colors';
 
 export default function Home() {
-  // set theme colors
+  // Set MUI theme colors
   const theme = createTheme({
     palette: {
       primary: blue,
@@ -13,123 +13,99 @@ export default function Home() {
     },
   });
 
+  // Initial message from the tutor
   const [messages, setMessages] = useState([
-    {
-      role: 'assistant',
-      content: "Hi! I'm the Italian Language AI Tutor! How can I support you today?"
-    },
+    { role: 'assistant', content: "Hi! I'm the Italian Language AI Tutor! What would you like to review today?" }
   ]);
-  const [message, setMessage] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+  const [message, setMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const sendMessage = async () => {
-    //removed isloading
     if (!message.trim() || isLoading) return;
-    setIsLoading(true)
+    setIsLoading(true);
 
-    // Don't send empty messages
-
-    setMessage('')  // Clear the input field
-    setMessages((messages) => [
+    // Create an updated conversation history including the new user message and a placeholder for the AI's response.
+    const updatedMessages = [
       ...messages,
-      { role: 'user', content: message },  // Add the user's message to the chat
-      { role: 'assistant', content: '' },  // Add a placeholder for the assistant's response
-    ])
+      { role: 'user', content: message },
+      { role: 'assistant', content: '' }
+    ];
+    // Immediately update state so the UI shows the new user message.
+    setMessages(updatedMessages);
+    setMessage('');
 
     try {
-      // Send the message to the server
+      // Trim the conversation history to include only the last 6 messages (adjust as needed)
+      const trimmedMessages = updatedMessages.slice(-6);
+      
       const response = await fetch('/api/chat', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        //change?
-        body: JSON.stringify({ message }),
-      })
-      // Check if response is valid
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: trimmedMessages }),
+      });
       if (!response.ok) {
-        throw new Error('Network response was not ok')
+        throw new Error('Network response was not ok');
       }
-      const reader = response.body.getReader()  // Get a reader to read the response body
-      const decoder = new TextDecoder()  // Create a decoder to decode the response text
 
-      let result = '';
-      reader.read().then(function processText({ done, value }) {
-        if (done) return result;
-        const text = decoder.decode(value || new Int8Array(), { stream: true })  // Decode the text
-        setMessages((messages) => {
-          let lastMessage = messages[messages.length - 1]  // Get the last message (assistant's placeholder)
-          let otherMessages = messages.slice(0, messages.length - 1)  // Get all other messages
-          return [
-            ...otherMessages,
-            { ...lastMessage, content: lastMessage.content + text },  // Append the decoded text to the assistant's message
-          ]
-        })
-      })
-
+      // Read and stream the AI's response chunk-by-chunk
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let done = false;
+      while (!done) {
+        const { done: isDone, value } = await reader.read();
+        done = isDone;
+        if (value) {
+          const chunk = decoder.decode(value, { stream: true });
+          // Update the last message (assistant's placeholder) by appending the new chunk
+          setMessages(prevMessages => {
+            const lastMessage = prevMessages[prevMessages.length - 1];
+            return [
+              ...prevMessages.slice(0, -1),
+              { ...lastMessage, content: lastMessage.content + chunk }
+            ];
+          });
+        }
+      }
     } catch (error) {
-      console.error('Error:', error)
-      setMessages((messages) => [
-        ...messages,
-        { role: 'assistant', content: "I'm sorry, but I encountered an error. Please try again later." },
-      ])
+      console.error('Error:', error);
+      setMessages(prevMessages => [
+        ...prevMessages,
+        { role: 'assistant', content: "I'm sorry, but I encountered an error. Please try again later." }
+      ]);
     }
-    setIsLoading(false)
-  }
-
+    setIsLoading(false);
+  };
 
   const handleKeyPress = (event) => {
     if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault()
-      sendMessage()
+      event.preventDefault();
+      sendMessage();
     }
-  }
+  };
 
-  const messagesEndRef = useRef(null)
-
+  // Scroll to the bottom whenever messages update
+  const messagesEndRef = useRef(null);
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }
-
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
   useEffect(() => {
-    scrollToBottom()
-  }, [messages])
+    scrollToBottom();
+  }, [messages]);
 
   return (
     <Box width="100vw" height="100vh" display="flex" flexDirection="column" justifyContent="center" alignItems="center" bgcolor="white">
-      <Stack direction={'column'} width="500px" height="700px" border="1px solid black" p={2} spacing={3}>
-        <Stack
-          direction={'column'}
-          spacing={2}
-          flexGrow={1}
-          overflow="auto"
-          maxHeight="100%"
-        >
-          {messages.map((message, index) => (
-            <Box
-              key={index}
-              display="flex"
-              justifyContent={
-                message.role === 'assistant' ? 'flex-start' : 'flex-end'
-              }
-            >
-              <Box
-                bgcolor={
-                  message.role === 'assistant'
-                    ? 'primary.main'
-                    : 'secondary.main'
-                }
-                color="white"
-                borderRadius={16}
-                p={3}
-              >
-                {message.content}
+      <Stack direction="column" width="500px" height="700px" border="1px solid black" p={2} spacing={3}>
+        <Stack direction="column" spacing={2} flexGrow={1} overflow="auto" maxHeight="100%">
+          {messages.map((msg, index) => (
+            <Box key={index} display="flex" justifyContent={msg.role === 'assistant' ? 'flex-start' : 'flex-end'}>
+              <Box bgcolor={msg.role === 'assistant' ? 'primary.main' : 'secondary.main'} color="white" borderRadius={16} p={3}>
+                {msg.content}
               </Box>
             </Box>
           ))}
           <div ref={messagesEndRef} />
         </Stack>
-        <Stack direction={'row'} spacing={2}>
+        <Stack direction="row" spacing={2}>
           <TextField
             label="Message"
             fullWidth
@@ -144,5 +120,5 @@ export default function Home() {
         </Stack>
       </Stack>
     </Box>
-  )
+  );
 }
