@@ -94,7 +94,15 @@ export default function Home() {
 
   return (
     <Box width="100vw" height="100vh" display="flex" flexDirection="column" justifyContent="center" alignItems="center" bgcolor="white">
-      <Stack direction="column" width="500px" height="700px" border="1px solid black" p={2} spacing={3}>
+      <Stack
+        direction="column"
+        // Responsive width: 500px for larger screens; 90% of the viewport for small screens (e.g. iPhone 13)
+        width={{ xs: '90%', sm: '500px' }}
+        height="700px"
+        border="1px solid black"
+        p={2}
+        spacing={3}
+      >
         <Stack direction="column" spacing={2} flexGrow={1} overflow="auto" maxHeight="100%">
           {messages.map((msg, index) => (
             <Box key={index} display="flex" justifyContent={msg.role === 'assistant' ? 'flex-start' : 'flex-end'}>
