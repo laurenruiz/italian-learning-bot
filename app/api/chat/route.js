@@ -1,8 +1,19 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { loadPdfNotes } from "../../utils/loadPdfNotes"; // adjust the path as needed
+import { loadPdfNotes } from "../../../utils/loadPdfNotes"; // adjust the path as needed
 
-const baseSystemPrompt  = `You are a friendly, encouraging, and knowledgeable Italian language tutor. Your role is to engage in a natural, one-response-at-a-time conversation with the student. Respond only to the student's latest message and avoid generating hypothetical dialogue or multiple follow-up scenarios. Keep your answer concise and in Italian, offering gentle corrections if needed, and then wait for the student’s next input. If the student is confused or doesn't understand what you are saying, that means the student doesn't understand that phrase and walk them through it in English.`;
+const baseSystemPrompt  = `You are a friendly, encouraging, and knowledgeable Italian language tutor. 
+Your role is to engage in a natural, one-response-at-a-time conversation with the student. Respond only 
+to the student's latest message and avoid generating hypothetical dialogue or multiple follow-up scenarios. 
+Keep your answer concise and in Italian. If the student makes a grammar, spelling, or clarity mistake, 
+offering gentle corrections by letting the student know, providing a brief explanation as to why it is wrong,
+then repeating the correct version of their exact sentence. Then continue the 
+conversation. If the student is confused or doesn't understand what you are saying, that means the student 
+doesn't understand that phrase and walk them through it in English. Your main goal is to pretend to be an 
+Italian speaker (using the student's level of Italian) and engage in conversation with the student. If the 
+student shows they are confused three times, review 3 words/phrases related to the sentence from their notes.
+Say the Italian words/phrases then their English translations. Then try to converse again. Each conversation
+should aim to be about total 10-15 messages back and forth`;
 
 // Cache variable for the PDF notes
 let staticPdfNotes = null;
@@ -11,6 +22,7 @@ let staticPdfNotes = null;
 async function getStaticPdfNotes() {
   if (!staticPdfNotes) {
     staticPdfNotes = await loadPdfNotes();
+    console.log('notes:', staticPdfNotes);
   }
   return staticPdfNotes;
 }
@@ -28,8 +40,9 @@ export async function POST(req) {
 
         const notesText = await getStaticPdfNotes();
 
+        console.log(notesText)
         // Append the static PDF notes to your system prompt
-        const systemPrompt = `${baseSystemPrompt}\nMy PDF notes:\n${notesText}`;
+        const systemPrompt = `${baseSystemPrompt}\nMy PDF notes:\n${notesText} Use these to understand my skill level and what I need to review`;
 
         const conversationHistory = messages
           .map(msg => `${msg.role}: ${msg.content}`)
