@@ -22,7 +22,6 @@ let staticPdfNotes = null;
 async function getStaticPdfNotes() {
   if (!staticPdfNotes) {
     staticPdfNotes = await loadPdfNotes();
-    console.log('notes:', staticPdfNotes);
   }
   return staticPdfNotes;
 }
@@ -40,7 +39,6 @@ export async function POST(req) {
 
         const notesText = await getStaticPdfNotes();
 
-        console.log(notesText)
         // Append the static PDF notes to your system prompt
         const systemPrompt = `${baseSystemPrompt}\nMy PDF notes:\n${notesText} Use these to understand my skill level and what I need to review`;
 

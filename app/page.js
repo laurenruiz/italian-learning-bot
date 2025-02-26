@@ -2,14 +2,14 @@
 import { Box, Stack, TextField, Button } from "@mui/material";
 import { useState, useRef, useEffect } from "react";
 import { createTheme } from '@mui/material/styles';
-import { blue, indigo } from '@mui/material/colors';
+import { blue, blueGrey } from '@mui/material/colors';
 
 export default function Home() {
   // Set MUI theme colors
   const theme = createTheme({
     palette: {
       primary: blue,
-      secondary: indigo,
+      secondary: blueGrey,
     },
   });
 
@@ -98,7 +98,7 @@ export default function Home() {
         <Stack direction="column" spacing={2} flexGrow={1} overflow="auto" maxHeight="100%">
           {messages.map((msg, index) => (
             <Box key={index} display="flex" justifyContent={msg.role === 'assistant' ? 'flex-start' : 'flex-end'}>
-              <Box bgcolor={msg.role === 'assistant' ? 'primary.main' : 'secondary.main'} color="white" borderRadius={16} p={3}>
+              <Box bgcolor={msg.role === 'assistant' ? theme.palette.primary.main : theme.palette.secondary.main } color="white" borderRadius={16} p={3}>
                 {msg.content}
               </Box>
             </Box>
@@ -114,7 +114,7 @@ export default function Home() {
             onKeyDown={handleKeyPress}
             disabled={isLoading}
           />
-          <Button variant="contained" onClick={sendMessage} disabled={isLoading}>
+          <Button variant="contained" onClick={sendMessage} disabled={isLoading} >
             {isLoading ? 'Sending' : 'Send'}
           </Button>
         </Stack>
