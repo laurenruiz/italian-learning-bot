@@ -18,7 +18,7 @@
     "@mui/material": "^6.4.5",
     "@mui/material-nextjs": "^6.4.5",
     "@pinecone-database/pinecone": "^8.0.0",
-    "next": "15.1.7",
+    "next": "15.5.20",
     "pdf-parse": "^1.1.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -27,6 +27,6 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "eslint": "^9",
-    "eslint-config-next": "15.1.7"
+    "eslint-config-next": "15.5.20"
   }
 }
