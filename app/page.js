@@ -239,7 +239,16 @@ export default function Home() {
       }}
     >
       <Show when="signed-out">
-        <Stack spacing={2} alignItems="center">
+        <Stack
+          spacing={2}
+          alignItems="center"
+          sx={{
+            backgroundColor: 'white',
+            borderRadius: 2,
+            p: 4,
+            boxShadow: 3,
+          }}
+        >
           <Typography variant="h5">Language AI Tutor</Typography>
           <Typography variant="body2" color="text.secondary">
             Sign in to start learning and upload your own notes.
