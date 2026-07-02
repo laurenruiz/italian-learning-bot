@@ -1,3 +1,4 @@
+import { ClerkProvider } from '@clerk/nextjs';
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -12,23 +13,24 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Italian AI Tutor",
-  description: "Italian AI Tutor to help you learn Italian through conversation!",
+  title: "AI Language Tutor",
+  description: "AI Tutor to help you learn a new language through conversation!",
   icons: {
-    icon: "./app/butterfly_darker_pink_cropped.png"
+    icon: "/icon.png"
   }
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <head>
-        {/* This meta tag ensures proper scaling on mobile devices */}
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      </head>
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {children}
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <head>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        </head>
+        <body className={`${geistSans.variable} ${geistMono.variable}`}>
+          {children}
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

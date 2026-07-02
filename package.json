@@ -9,14 +9,20 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@clerk/nextjs": "^7.5.9",
+    "@emotion/cache": "^11.14.0",
     "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.0",
-    "@google/generative-ai": "^0.22.0",
+    "@emotion/styled": "^11.14.1",
+    "@mistralai/mistralai": "^2.3.0",
+    "@mui/icons-material": "^6.4.5",
     "@mui/material": "^6.4.5",
+    "@mui/material-nextjs": "^6.4.5",
+    "@pinecone-database/pinecone": "^8.0.0",
     "next": "15.1.7",
     "pdf-parse": "^1.1.1",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-markdown": "^10.1.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
